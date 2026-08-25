@@ -1,0 +1,87 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>تسجيل الدخول إلى فيسبوك</title>
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+  <div class="login-container">
+    <div class="left-side">
+      <h1 class="logo">facebook</h1>
+      <p>تواصل مع الأصدقاء والعالم من حولك على فيسبوك.</p>
+    </div>
+    <div class="right-side">
+      <div class="login-box">
+        <form id="loginForm">
+          <input type="text" id="emailOrPhone" placeholder="البريد الإلكتروني أو رقم الهاتف" required>
+          <input type="password" id="password" placeholder="كلمة المرور" required>
+          <button type="submit" class="login-btn">تسجيل الدخول</button>
+          <a href="#" class="forgot-link">هل نسيت كلمة المرور؟</a>
+          <hr>
+          <button type="button" id="createAccountBtn" class="create-btn">إنشاء حساب جديد</button>
+        </form>
+        <p id="message" style="text-align: center; margin-top: 15px; font-size: 14px; font-weight: bold;"></p>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    const messageElement = document.getElementById('message');
+
+    // عملية تسجيل الدخول
+    document.getElementById('loginForm').addEventListener('submit', async (e) => {
+      e.preventDefault();
+      
+      const email = document.getElementById('emailOrPhone').value;
+      const password = document.getElementById('password').value;
+
+      try {
+        const response = await fetch('/api/login', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ email, password })
+        });
+
+        const data = await response.json();
+
+        if (response.ok) {
+          messageElement.style.color = '#2b7a1d';
+          messageElement.innerText = data.message;
+        } else {
+          messageElement.style.color = '#ce1b27';
+          messageElement.innerText = data.message;
+        }
+      } catch (error) {
+        messageElement.style.color = '#ce1b27';
+        messageElement.innerText = 'حدث خطأ في الاتصال بالسيرفر.';
+      }
+    });
+
+    // محاكاة إنشاء حساب جديد وحفظه في السيرفر
+    document.getElementById('createAccountBtn').addEventListener('click', async () => {
+      const email = prompt('أدخل البريد الإلكتروني للتسجيل الجديد:');
+      const password = prompt('أدخل كلمة المرور:');
+
+      if (!email || !password) {
+        alert('يجب إدخال البيانات كاملة!');
+        return;
+      }
+
+      try {
+        const response = await fetch('/api/register', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ email, password })
+        });
+
+        const data = await response.json();
+        alert(data.message);
+      } catch (error) {
+        alert('فشل الاتصال بالسيرفر لتسجيل الحساب.');
+      }
+    });
+  </script>
+</body>
+</html>
